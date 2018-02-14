@@ -3,6 +3,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -73,9 +74,11 @@ def invite_user_to_chat(request, chat_id):
 @api_view(['GET'])
 def get_messages(request, chat_id):
     chat = get_chat(request, chat_id)
+    paginator = PageNumberPagination()
     queryset = Message.objects.filter(chat=chat)
-    messages = MessageSerializer(queryset, many=True)
-    return Response(messages.data)
+    context = paginator.paginate_queryset(queryset, request)
+    messages = MessageSerializer(context, many=True)
+    return paginator.get_paginated_response(messages.data)
 
 
 @api_view(['POST'])
