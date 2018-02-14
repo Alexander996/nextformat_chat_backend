@@ -10,13 +10,18 @@ from rest_framework.viewsets import GenericViewSet
 from chat.serializers import *
 
 
+def create_object(serializer, data, **kwargs):
+    obj = serializer(data=data)
+    obj.is_valid(raise_exception=True)
+    obj.save(**kwargs)
+    return obj
+
+
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def register(request):
     data = request.data
-    user = UserSerializer(data=data)
-    user.is_valid(raise_exception=True)
-    user.save()
+    user = create_object(UserSerializer, data)
     user_id = user.data['id']
     token, created = Token.objects.get_or_create(user=get_object_or_404(User, pk=user_id))
     return Response({'token': token.key})
@@ -38,36 +43,36 @@ class ChatViewSet(viewsets.ModelViewSet):
         return Chat.objects.filter(chatuser__user=self.request.user)
 
 
-@api_view(['POST'])
-def invite_user_to_chat(request, chat_id):
-    chat = get_object_or_404(Chat, id=chat_id)
-    request_user = request.user
-
+def check_user_chat_permissions(chat, user):
     try:
-        request_user.chat_set.get(id=chat_id)
+        user.chat_set.get(id=chat.id)
     except Chat.DoesNotExist:
         raise PermissionDenied
 
+
+def get_chat(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+    user = request.user
+    check_user_chat_permissions(chat, user)
+    return chat
+
+
+@api_view(['POST'])
+def invite_user_to_chat(request, chat_id):
+    chat = get_chat(request, chat_id)
     data = request.data
     user_id = data.get('user')
     if user_id is None:
         raise ValidationError(dict(user='This field is required'))
 
-    user = get_object_or_404(User, id=user_id)
-    ChatUser.objects.create(user=user, chat=chat)
+    invited_user = get_object_or_404(User, id=user_id)
+    ChatUser.objects.create(user=invited_user, chat=chat)
     return Response()
 
 
 @api_view(['GET'])
 def get_messages(request, chat_id):
-    chat = get_object_or_404(Chat, id=chat_id)
-    user = request.user
-
-    try:
-        user.chat_set.get(id=chat_id)
-    except Chat.DoesNotExist:
-        raise PermissionDenied
-
+    chat = get_chat(request, chat_id)
     queryset = Message.objects.filter(chat=chat)
     messages = MessageSerializer(queryset, many=True)
     return Response(messages.data)
@@ -75,16 +80,8 @@ def get_messages(request, chat_id):
 
 @api_view(['POST'])
 def send_message(request, chat_id):
-    chat = get_object_or_404(Chat, id=chat_id)
+    chat = get_chat(request, chat_id)
     user = request.user
-
-    try:
-        user.chat_set.get(id=chat_id)
-    except Chat.DoesNotExist:
-        raise PermissionDenied
-
     data = request.data
-    message = MessageSerializer(data=data)
-    message.is_valid(raise_exception=True)
-    message.save(chat=chat, user=request.user)
+    message = create_object(MessageSerializer, data, chat=chat, user=user)
     return Response(message.data)
