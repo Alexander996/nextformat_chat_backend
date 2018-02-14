@@ -2,3 +2,4 @@
 *__pycache__*
 chat/migrations/
 db.sqlite3
+documentation/nextformat_chat_api.html

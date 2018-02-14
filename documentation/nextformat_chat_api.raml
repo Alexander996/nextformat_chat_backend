@@ -1,0 +1,21 @@
+#%RAML 1.0
+title: NextFormat Chat
+version: v1
+mediaType: application/json
+baseUri: http://176.57.215.171/api/
+
+/register/:
+  description: Регистация новых пользователей
+  post:
+    body:
+      application/json:
+        properties:
+          username: string
+          password: string
+    responses:
+      200:
+        description: Пользователь успешно зарегистрирован
+        body:
+          application/json:
+            properties:
+              token?: string
