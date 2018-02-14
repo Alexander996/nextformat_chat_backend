@@ -1,6 +1,7 @@
 from rest_framework import mixins, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -40,6 +41,13 @@ class ChatViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def invite_user_to_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
+    request_user = request.user
+
+    try:
+        request_user.chat_set.get(id=chat_id)
+    except Chat.DoesNotExist:
+        raise PermissionDenied
+
     data = request.data
     user_id = data.get('user')
     if user_id is None:

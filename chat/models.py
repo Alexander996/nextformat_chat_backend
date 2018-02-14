@@ -4,7 +4,7 @@ from django.db import models
 
 class Chat(models.Model):
     name = models.CharField(max_length=30)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, through='ChatUser')
 
 
 class ChatUser(models.Model):
