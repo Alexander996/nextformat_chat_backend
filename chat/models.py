@@ -20,3 +20,6 @@ class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     text = models.TextField()
+
+    class Meta:
+        ordering = ['-auto_date']
