@@ -1,7 +1,8 @@
 from rest_framework import mixins
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -9,6 +10,7 @@ from chat.serializers import *
 
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def register(request):
     data = request.data
     user = UserSerializer(data=data)
