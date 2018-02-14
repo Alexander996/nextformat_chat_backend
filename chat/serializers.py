@@ -61,7 +61,9 @@ class ChatSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Message
         exclude = ('chat',)
-        read_only_fields = ('auto_date', 'user')
+        read_only_fields = ('auto_date',)
