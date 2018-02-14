@@ -39,12 +39,15 @@ class ChatSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         users = validated_data.pop('chatuser_set')
+        request_user = self._context['request'].user
         if not users:
             raise ValidationError(dict(detail='users can not be empty'))
 
         chat = Chat.objects.create(**validated_data)
         for user in users:
-            ChatUser.objects.create(**user, chat=chat)
+            if user['user'] != request_user:
+                ChatUser.objects.create(**user, chat=chat)
+        ChatUser.objects.create(user=request_user, chat=chat)
         return chat
 
     def to_representation(self, instance):
