@@ -58,3 +58,10 @@ class ChatSerializer(serializers.ModelSerializer):
             user_list.append(user['user'])
         ret['users'] = user_list
         return ret
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        exclude = ('chat',)
+        read_only_fields = ('auto_date', 'user')

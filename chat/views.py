@@ -56,3 +56,20 @@ def invite_user_to_chat(request, chat_id):
     user = get_object_or_404(User, id=user_id)
     ChatUser.objects.create(user=user, chat=chat)
     return Response()
+
+
+@api_view(['POST'])
+def send_message(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+    user = request.user
+
+    try:
+        user.chat_set.get(id=chat_id)
+    except Chat.DoesNotExist:
+        raise PermissionDenied
+
+    data = request.data
+    message = MessageSerializer(data=data)
+    message.is_valid(raise_exception=True)
+    message.save(chat=chat, user=request.user)
+    return Response(message.data)
