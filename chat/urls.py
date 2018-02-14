@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^login/', auth_views.obtain_auth_token),
     url(r'^register/', views.register),
     url(r'chats/(?P<chat_id>[0-9]+)/invite/', views.invite_user_to_chat),
+    url(r'chats/(?P<chat_id>[0-9]+)/messages/', views.get_messages),
     url(r'chats/(?P<chat_id>[0-9]+)/send_message/', views.send_message),
 ]

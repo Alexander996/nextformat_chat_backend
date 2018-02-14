@@ -58,6 +58,21 @@ def invite_user_to_chat(request, chat_id):
     return Response()
 
 
+@api_view(['GET'])
+def get_messages(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+    user = request.user
+
+    try:
+        user.chat_set.get(id=chat_id)
+    except Chat.DoesNotExist:
+        raise PermissionDenied
+
+    queryset = Message.objects.filter(chat=chat)
+    messages = MessageSerializer(queryset, many=True)
+    return Response(messages.data)
+
+
 @api_view(['POST'])
 def send_message(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
