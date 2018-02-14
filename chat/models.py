@@ -7,6 +7,14 @@ class Chat(models.Model):
     users = models.ManyToManyField(User)
 
 
+class ChatUser(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('chat', 'user')
+
+
 class Message(models.Model):
     auto_date = models.DateTimeField(auto_now_add=True)
     chat = models.ForeignKey(Chat, on_delete=models.PROTECT)
