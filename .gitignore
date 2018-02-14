@@ -1,3 +1,4 @@
 .idea/
 *__pycache__*
-app/migrations/
+chat/migrations/
+db.sqlite3
