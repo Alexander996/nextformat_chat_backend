@@ -33,7 +33,7 @@ def register(request):
     user = create_object(UserSerializer, data)
     user_id = user.data['id']
     token, created = Token.objects.get_or_create(user=get_object_or_404(User, pk=user_id))
-    return Response({'token': token.key})
+    return Response({'token': token.key, 'id': user_id})
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
