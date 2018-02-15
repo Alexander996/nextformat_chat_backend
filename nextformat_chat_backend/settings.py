@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import tornado_websockets
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'chat',
     'rest_framework',
     'rest_framework.authtoken',
+    'tornado_websockets',
 ]
 
 MIDDLEWARE = [
@@ -131,4 +134,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20
+}
+
+TORNADO = {
+    'port': 8000,    # 8000 by default
+    'handlers': [
+        # ...
+        tornado_websockets.django_app(),  # django_app is using a "wildcard" route, so it should be the last element
+    ],
+    'settings': {
+        'debug': True,
+    }
 }

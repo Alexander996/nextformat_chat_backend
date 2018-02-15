@@ -7,8 +7,16 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from tornado.websocket import WebSocketClosedError
+from tornado_websockets.websocket import WebSocket
 
 from chat.serializers import *
+
+
+connected_users = {}
+
+
+ws = WebSocket('/connect')
 
 
 def create_object(serializer, data, **kwargs):
@@ -87,4 +95,36 @@ def send_message(request, chat_id):
     user = request.user
     data = request.data
     message = create_object(MessageSerializer, data, chat=chat, user=user)
+
+    # WebSocket
+    chat_users = chat.users.exclude(id=user.id)
+    for chat_user in chat_users:
+        sock = connected_users.get(chat_user.id)
+        if sock is None:
+            continue
+        try:
+            sock.emit('on_message', message.data)
+        except WebSocketClosedError:
+            del connected_users[chat_user.id]
+
     return Response(message.data)
+
+
+"""
+WebSockets
+"""
+
+
+@ws.on
+def on_open(socket, data):
+    socket.emit('success_auth', {})
+
+
+@ws.on
+def auth(socket, data):
+    print(data)
+    user_id = data.get('id')
+    if user_id is None:
+        socket.emit('error', {'detail': '"id" is required'})
+        return
+    connected_users[user_id] = socket
