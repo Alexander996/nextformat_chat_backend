@@ -95,6 +95,8 @@ def send_message(request, chat_id):
     user = request.user
     data = request.data
     message = create_object(MessageSerializer, data, chat=chat, user=user)
+    chat.last_date = message.data['auto_date']
+    chat.save()
 
     # WebSocket
     chat_users = chat.users.exclude(id=user.id)

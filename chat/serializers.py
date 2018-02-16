@@ -36,6 +36,7 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
+        read_only_fields = ('last_date',)
 
     def create(self, validated_data):
         users = validated_data.pop('chatuser_set')
@@ -65,5 +66,5 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        exclude = ('chat',)
-        read_only_fields = ('auto_date',)
+        fields = '__all__'
+        read_only_fields = ('auto_date', 'chat')
