@@ -27,7 +27,7 @@ SECRET_KEY = 'rfzk=et6b37=i*k1608-1irrc&c#d!2^y^kj_^ssmy6xrkdhlt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['176.57.215.171', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -137,7 +137,7 @@ REST_FRAMEWORK = {
 }
 
 TORNADO = {
-    'port': 8000,    # 8000 by default
+    'port': 8000,
     'handlers': [
         # ...
         tornado_websockets.django_app(),  # django_app is using a "wildcard" route, so it should be the last element
