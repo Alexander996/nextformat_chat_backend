@@ -3,19 +3,54 @@ title: NextFormat Chat
 version: v1
 mediaType: application/json
 baseUri: http://176.57.215.171/api/
+securedBy: [access_token]
+securitySchemes:
+  access_token:
+    description: |
+      Запрос должен содержать заголовок "Authorization" со значение "Token {token}"
+    type: Token
+    describedBy:
+      headers:
+        Authorization:
+          type: string
+      responses:
+        401:
+          description: |
+            Неправильно указан заголовок или неверный токен
+
 
 /register/:
   description: Регистация новых пользователей
   post:
+    securedBy: [null]
     body:
-      application/json:
-        properties:
-          username: string
-          password: string
+      properties:
+        username: string
+        password: string
+        first_name: string
+        last_name: string
+      example:
+        username: baskach
+        password: "12345"
+        first_name: Сергей
+        last_name: Баскаков
     responses:
       200:
         description: Пользователь успешно зарегистрирован
         body:
-          application/json:
-            properties:
-              token?: string
+          properties:
+            token?: string
+            id?: integer
+          example:
+            token: 21370ebbc226c933a2c9c19636fac305c69ad1eb
+            id: 1
+      400:
+        description: Данный username уже занят
+
+/users/:
+  get:
+    responses:
+      200:
+        body:
+          properties:
+            users?: string
