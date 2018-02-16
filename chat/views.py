@@ -99,7 +99,7 @@ def send_message(request, chat_id):
     chat.save()
 
     # WebSocket
-    chat_users = chat.users.exclude(id=user.id)
+    chat_users = chat.users.all()
     for chat_user in chat_users:
         sock = connected_users.get(chat_user.id)
         if sock is None:
