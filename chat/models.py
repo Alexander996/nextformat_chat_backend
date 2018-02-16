@@ -14,6 +14,7 @@ class Chat(models.Model):
 class ChatUser(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    join_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('chat', 'user')

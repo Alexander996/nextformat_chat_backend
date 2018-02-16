@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ChatUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatUser
-        exclude = ('chat', 'id')
+        exclude = ('chat', 'id', 'join_date')
 
     def to_representation(self, instance):
         ret = super(ChatUserSerializer, self).to_representation(instance)

@@ -63,12 +63,12 @@ def get_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     user = request.user
     check_user_chat_permissions(chat, user)
-    return chat
+    return chat, user
 
 
 @api_view(['POST'])
 def invite_user_to_chat(request, chat_id):
-    chat = get_chat(request, chat_id)
+    chat, user = get_chat(request, chat_id)
     data = request.data
     user_id = data.get('user')
     if user_id is None:
@@ -81,9 +81,10 @@ def invite_user_to_chat(request, chat_id):
 
 @api_view(['GET'])
 def get_messages(request, chat_id):
-    chat = get_chat(request, chat_id)
+    chat, user = get_chat(request, chat_id)
+    join_date = chat.chatuser_set.get(user=user).join_date
     paginator = PageNumberPagination()
-    queryset = Message.objects.filter(chat=chat)
+    queryset = Message.objects.filter(chat=chat, auto_date__gt=join_date)
     context = paginator.paginate_queryset(queryset, request)
     messages = MessageSerializer(context, many=True)
     return paginator.get_paginated_response(messages.data)
@@ -91,8 +92,7 @@ def get_messages(request, chat_id):
 
 @api_view(['POST'])
 def send_message(request, chat_id):
-    chat = get_chat(request, chat_id)
-    user = request.user
+    chat, user = get_chat(request, chat_id)
     data = request.data
     message = create_object(MessageSerializer, data, chat=chat, user=user)
     chat.last_date = message.data['auto_date']
