@@ -4,6 +4,8 @@ from django.db import models
 
 class Chat(models.Model):
     last_date = models.DateTimeField(auto_now_add=True)
+    last_message = models.ForeignKey('Message', null=True, related_name='last_message',
+                                     on_delete=models.PROTECT)
     name = models.CharField(max_length=30)
     users = models.ManyToManyField(User, through='ChatUser')
 

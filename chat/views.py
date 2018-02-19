@@ -96,6 +96,7 @@ def send_message(request, chat_id):
     data = request.data
     message = create_object(MessageSerializer, data, chat=chat, user=user)
     chat.last_date = message.data['auto_date']
+    chat.last_message = get_object_or_404(Message, id=message.data['id'])
     chat.save()
 
     # WebSocket

@@ -30,8 +30,18 @@ class ChatUserSerializer(serializers.ModelSerializer):
         return ret
 
 
+class MessageSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = '__all__'
+        read_only_fields = ('auto_date', 'chat')
+
+
 class ChatSerializer(serializers.ModelSerializer):
     users = ChatUserSerializer(source='chatuser_set', many=True)
+    last_message = MessageSerializer(read_only=True)
 
     class Meta:
         model = Chat
@@ -59,12 +69,3 @@ class ChatSerializer(serializers.ModelSerializer):
             user_list.append(user['user'])
         ret['users'] = user_list
         return ret
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Message
-        fields = '__all__'
-        read_only_fields = ('auto_date', 'chat')
